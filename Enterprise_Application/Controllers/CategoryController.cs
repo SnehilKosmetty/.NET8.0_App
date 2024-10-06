@@ -34,6 +34,7 @@ namespace Enterprise_Application.Controllers
             {
                 _db.Categories.Add(obj);
                 _db.SaveChanges();
+                TempData["Success"] = "Category Created Successfully ";
                 return RedirectToAction("Index", "Category");
             }
             return View(obj);
@@ -59,18 +60,45 @@ namespace Enterprise_Application.Controllers
         [HttpPost]
         public IActionResult Edit(Category obj)
         {
-            if (obj.Name == obj.DisplayOrder.ToString())
-            {
-                ModelState.AddModelError("name", "The DisplayOrder cannot exactly match the Name.");
-            }
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
+                _db.Categories.Update(obj);
                 _db.SaveChanges();
+                TempData["Success"] = "Category Updated Successfully ";
                 return RedirectToAction("Index", "Category");
             }
             return View(obj);
 
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == null || id == 0)
+            {
+                return NotFound();
+            }
+            Category? categoryfromDb = _db.Categories.Find(id);
+            if (categoryfromDb == null)
+            {
+                return NotFound();
+            }
+            return View(categoryfromDb);
+        }
+
+
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePost(int? id)
+        {
+            Category? obj = _db.Categories.Find(id); 
+            if (obj == null)
+            {
+                return NotFound();
+            }
+                _db.Categories.Remove(obj);
+                _db.SaveChanges();
+            TempData["Success"] = "Category Deleted Successfully ";
+            return RedirectToAction("Index", "Category");
         }
     }
 }
