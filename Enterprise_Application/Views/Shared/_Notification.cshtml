@@ -3,6 +3,9 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script type="text/javascript">
+        toastr.options = {
+            "progressBar": true
+        };
         toastr.success('@TempData["Success"]');
     </script>
 }
@@ -12,6 +15,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script type="text/javascript">
-        toastr.error('@TempData["Success"]');
+        toastr.error('@TempData["Error"]');
     </script>
 }
