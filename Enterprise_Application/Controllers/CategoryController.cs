@@ -1,5 +1,5 @@
-﻿using Enterprise_Application.Data;
-using Enterprise_Application.Models;
+﻿using Enterprise.Models;
+using Enterprise_Application.DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Enterprise_Application.Controllers
