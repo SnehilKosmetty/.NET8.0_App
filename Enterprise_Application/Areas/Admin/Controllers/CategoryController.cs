@@ -1,20 +1,22 @@
-﻿using Enterprise.Models;
+﻿using Enterprise.DataAccess.Repository.IRepository;
+using Enterprise.Models;
 using Enterprise_Application.DataAccess.Data;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Enterprise_Application.Controllers
+namespace Enterprise_Application.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
 
-        private readonly ApplicationDbContext _db;
-        public CategoryController(ApplicationDbContext db)
+        private readonly IUnitOfWork _unitOfWork;
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _db = db;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
         {
-            List<Category> objCategoryList = _db.Categories.ToList();
+            List<Category> objCategoryList = _unitOfWork.Category.GetAll().ToList();
             return View(objCategoryList);
         }
 
@@ -32,22 +34,22 @@ namespace Enterprise_Application.Controllers
             }
             if (ModelState.IsValid)
             {
-                _db.Categories.Add(obj);
-                _db.SaveChanges();
+                _unitOfWork.Category.Add(obj);
+                _unitOfWork.Save();
                 TempData["Success"] = "Category Created Successfully ";
                 return RedirectToAction("Index", "Category");
             }
             return View(obj);
-            
+
         }
 
         public IActionResult Edit(int? id)
         {
-            if(id==null || id == 0)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
-            Category? categoryfromDb = _db.Categories.Find(id);
+            Category? categoryfromDb = _unitOfWork.Category.Get(u => u.ID == id);
             //Category? categoryfromDb1 = _db.Categories.FirstOrDefault(u=>u.ID==id);
             //Category? categoryfromDb2 = _db.Categories.Where(u=>u.ID==id).FirstOrDefault();
             if (categoryfromDb == null)
@@ -62,8 +64,8 @@ namespace Enterprise_Application.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Categories.Update(obj);
-                _db.SaveChanges();
+                _unitOfWork.Category.Update(obj);
+                _unitOfWork.Save();
                 TempData["Success"] = "Category Updated Successfully ";
                 return RedirectToAction("Index", "Category");
             }
@@ -77,7 +79,7 @@ namespace Enterprise_Application.Controllers
             {
                 return NotFound();
             }
-            Category? categoryfromDb = _db.Categories.Find(id);
+            Category? categoryfromDb = _unitOfWork.Category.Get(u => u.ID == id);
             if (categoryfromDb == null)
             {
                 return NotFound();
@@ -90,13 +92,13 @@ namespace Enterprise_Application.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePost(int? id)
         {
-            Category? obj = _db.Categories.Find(id); 
+            Category? obj = _unitOfWork.Category.Get(u => u.ID == id);
             if (obj == null)
             {
                 return NotFound();
             }
-                _db.Categories.Remove(obj);
-                _db.SaveChanges();
+            _unitOfWork.Category.Remove(obj);
+            _unitOfWork.Save();
             TempData["Success"] = "Category Deleted Successfully ";
             return RedirectToAction("Index", "Category");
         }
