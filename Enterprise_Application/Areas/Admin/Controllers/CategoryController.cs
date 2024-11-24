@@ -1,11 +1,14 @@
 ﻿using Enterprise.DataAccess.Repository.IRepository;
 using Enterprise.Models;
+using Enterprise.Utility;
 using Enterprise_Application.DataAccess.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Enterprise_Application.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class CategoryController : Controller
     {
 
