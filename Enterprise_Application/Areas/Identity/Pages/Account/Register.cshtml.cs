@@ -148,7 +148,7 @@ namespace Enterprise_Application.Areas.Identity.Pages.Account
                  CompanyList = _unitOfWork.Company.GetAll().Select(i => new SelectListItem
                  {
                      Text = i.Name,
-                     Value = i.Id.ToString()
+                     Value = i.ID.ToString()
                  })
             };
 
@@ -175,7 +175,7 @@ namespace Enterprise_Application.Areas.Identity.Pages.Account
 
                 if(Input.Role == SD.Role_Company)
                 {
-                    user.CompanyId= Input.CompanyId;
+                    user.CompanyId = Input.CompanyId;
                 }
 
                 var result = await _userManager.CreateAsync(user, Input.Password);

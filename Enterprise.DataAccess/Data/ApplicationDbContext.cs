@@ -15,6 +15,8 @@ namespace Enterprise_Application.DataAccess.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Company> Companies { get; set; }
+
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,7 +33,7 @@ namespace Enterprise_Application.DataAccess.Data
             modelBuilder.Entity<Company>().HasData(
                new Company
                {
-                   Id = 1,
+                   ID = 1,
                    Name = "Tech Solution",
                    StreetAddress = "123 Main St",
                    City = "Tech City",
@@ -41,7 +43,7 @@ namespace Enterprise_Application.DataAccess.Data
                },
                new Company
                {
-                   Id = 2,
+                   ID = 2,
                    Name = "Sparks",
                    StreetAddress = "143 Main St",
                    City = "Spark City",
@@ -51,7 +53,7 @@ namespace Enterprise_Application.DataAccess.Data
                },
                new Company
                {
-                   Id = 3,
+                   ID = 3,
                    Name = "Books Club",
                    StreetAddress = "423 High St",
                    City = "Rare City",

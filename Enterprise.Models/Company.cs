@@ -9,7 +9,7 @@ namespace Enterprise.Models
 {
     public  class Company
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         [Required]
         public string Name {  get; set; }
         public string? StreetAddress { get; set; }

@@ -41,7 +41,7 @@ namespace Enterprise_Application.Areas.Admin.Controllers
             else
             {
                 //Update
-                Company companyObj = _unitOfWork.Company.Get(u => u.Id == id);
+                Company companyObj = _unitOfWork.Company.Get(u => u.ID == id);
                 return View(companyObj);
             }
 
@@ -54,7 +54,7 @@ namespace Enterprise_Application.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
 
-                if(CompanyObj.Id == 0)
+                if(CompanyObj.ID == 0)
                 {
                     _unitOfWork.Company.Add(CompanyObj);
                 }
@@ -89,7 +89,7 @@ namespace Enterprise_Application.Areas.Admin.Controllers
         [HttpDelete]
         public IActionResult Delete(int? id)
         {
-            var CompanyToBeDeleted = _unitOfWork.Company.Get(u=>u.Id == id);
+            var CompanyToBeDeleted = _unitOfWork.Company.Get(u=>u.ID == id);
             if (CompanyToBeDeleted == null)
             {
                 return Json(new {Sucess = false, message = "Error while deleting"});
