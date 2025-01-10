@@ -11,7 +11,7 @@ using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 namespace Enterprise_Application.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Roles = SD.Role_Admin)]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ProductController : Controller
     {
 

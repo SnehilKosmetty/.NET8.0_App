@@ -1,6 +1,8 @@
 using Enterprise.DataAccess.Repository.IRepository;
 using Enterprise.Models;
+using Enterprise.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Security.Claims;
@@ -21,6 +23,8 @@ namespace Enterprise_Application.Areas.Customer.Controllers
 
         public IActionResult Index()
         {
+          
+
             IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category");
             return View(productList);
         }
@@ -53,11 +57,15 @@ namespace Enterprise_Application.Areas.Customer.Controllers
                 //ShoppingCart Already Exists
                 cartFromDb.Count += shoppingCart.Count;
                 _unitOfWork.ShoppingCart.Update(cartFromDb);
+                _unitOfWork.Save();
             }
             else
             {
                 //Add Card Record
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
+                _unitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart, 
+                _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId).Count());
             }
 
             TempData["success"] = "Cart Updated Successfully";
