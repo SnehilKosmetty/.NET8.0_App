@@ -137,7 +137,7 @@ namespace Enterprise_Application.Areas.Admin.Controllers
 
             //Stripe Logic
 
-            var domain = "https://localhost:7193/";
+            var domain = Request.Scheme + "://" + Request.Host.Value + "/";
             var options = new Stripe.Checkout.SessionCreateOptions
             {
 

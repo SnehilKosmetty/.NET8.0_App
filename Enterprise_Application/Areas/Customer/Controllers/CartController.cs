@@ -136,7 +136,7 @@ namespace Enterprise_Application.Areas.Customer.Controllers
                 //it is a regular customer account, we need to capture a Payment.
                 //Stripe Logic
 
-                var domain = "https://localhost:7193/";
+                var domain = Request.Scheme+ "://"+ Request.Host.Value +"/";
                 var options = new Stripe.Checkout.SessionCreateOptions
                 {
               
