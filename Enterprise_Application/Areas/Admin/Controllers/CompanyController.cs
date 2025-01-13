@@ -92,13 +92,13 @@ namespace Enterprise_Application.Areas.Admin.Controllers
             var CompanyToBeDeleted = _unitOfWork.Company.Get(u=>u.ID == id);
             if (CompanyToBeDeleted == null)
             {
-                return Json(new {Sucess = false, message = "Error while deleting"});
+                return Json(new {success = false, message = "Error while deleting"});
             }
 
             _unitOfWork.Company.Remove(CompanyToBeDeleted);
             _unitOfWork.Save();
 
-            return Json(new {Sucess = true, message = "Delete Successful" });
+            return Json(new {success = true, message = "Delete Successful" });
         }
         #endregion
     }
