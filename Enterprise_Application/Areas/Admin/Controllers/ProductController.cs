@@ -53,7 +53,7 @@ namespace Enterprise_Application.Areas.Admin.Controllers
             else
             {
                 //Update
-                productVM.Product = _unitOfWork.Product.Get(u => u.ID == id);
+                productVM.Product = _unitOfWork.Product.Get(u => u.ID == id, includeProperties:"ProductImages");
                 return View(productVM);
             }
 
@@ -61,36 +61,12 @@ namespace Enterprise_Application.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
+        public IActionResult Upsert(ProductVM productVM, List<IFormFile> files)
         {
             if (ModelState.IsValid)
             {
-                string wwwRootPath = _webHostEnvironment.WebRootPath;
-                if(file != null)
-                {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productpath = Path.Combine(wwwRootPath, @"images\product");
 
-                    if (!string.IsNullOrEmpty(productVM.Product.ImageUrl))
-                    {
-                        //Delete existing Image
-                       var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageUrl.TrimStart('\\'));
-
-                        if(System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    using(var fileStream = new FileStream(Path.Combine(productpath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-
-                    productVM.Product.ImageUrl = @"\images\product\" + fileName;
-                }
-
-                if(productVM.Product.ID == 0)
+                if (productVM.Product.ID == 0)
                 {
                     _unitOfWork.Product.Add(productVM.Product);
                 }
@@ -98,9 +74,46 @@ namespace Enterprise_Application.Areas.Admin.Controllers
                 {
                     _unitOfWork.Product.Update(productVM.Product);
                 }
-                
+
                 _unitOfWork.Save();
-                TempData["Success"] = "Product Created Successfully ";
+
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                if(files != null)
+                {
+                    foreach(IFormFile file in files)
+                    {
+                        string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                        string productpath = @"images\products\product-" + productVM.Product.ID;
+                        string finalpath = Path.Combine(wwwRootPath, productpath);
+
+                        if(!Directory.Exists(finalpath))
+                            Directory.CreateDirectory(finalpath);
+
+                        using (var fileStream = new FileStream(Path.Combine(finalpath, fileName), FileMode.Create))
+                        {
+                            file.CopyTo(fileStream);
+                        }
+
+                        ProductImage productImage = new()
+                        {
+                            ImageUrl = @"\" + productpath + @"\" + fileName,
+                            ProductId = productVM.Product.ID,
+                        };
+
+                        if(productVM.Product.ProductImages == null)
+                            productVM.Product.ProductImages = new List<ProductImage>();
+
+                        productVM.Product.ProductImages.Add(productImage);
+
+                    }
+
+                    _unitOfWork.Product.Update(productVM.Product);
+                    _unitOfWork.Save();
+
+                }
+
+               
+                TempData["Success"] = "Product Created/updated Successfully ";
                 return RedirectToAction("Index", "Product");
             }
 
@@ -117,6 +130,34 @@ namespace Enterprise_Application.Areas.Admin.Controllers
               
         }
 
+
+        public IActionResult DeleteImage(int imageId)
+        {
+
+            var imageToBeDeleted = _unitOfWork.ProductImage.Get(u=>u.Id == imageId);
+            int productId = imageToBeDeleted.ProductId;
+            if(imageToBeDeleted != null)
+            {
+                if (!string.IsNullOrEmpty(imageToBeDeleted.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, 
+                    imageToBeDeleted.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                _unitOfWork.ProductImage.Remove(imageToBeDeleted);
+                _unitOfWork.Save();
+
+                TempData["success"] = "Deleted successfully";
+            }
+
+            return RedirectToAction(nameof(Upsert), new { id = productId });
+           
+        }
 
 
         #region API CALLS
@@ -137,13 +178,19 @@ namespace Enterprise_Application.Areas.Admin.Controllers
                 return Json(new {Sucess = false, message = "Error while deleting"});
             }
 
-            var oldImagePath = Path.Combine(_webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
+            string productpath = @"images\products\product-" + id;
+            string finalpath = Path.Combine(_webHostEnvironment.WebRootPath, productpath);
 
-            if (System.IO.File.Exists(oldImagePath))
+            if (!Directory.Exists(finalpath))
             {
-                System.IO.File.Delete(oldImagePath);
-            }
+                string[] filepaths = Directory.GetFiles(finalpath);
+                foreach (string filepath in filepaths)
+                {
+                    System.IO.File.Delete(filepath);
+                }
 
+                Directory.Delete(finalpath);
+            }
 
             _unitOfWork.Product.Remove(productToBeDeleted);
             _unitOfWork.Save();
